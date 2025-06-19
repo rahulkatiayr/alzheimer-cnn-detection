@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dementia Prediction</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 25px;
+        }
+
+        input[type="file"] {
+            margin-top: 15px;
+            font-size: 16px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease-in-out, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #1b5e20;
+            transform: scale(1.03);
+        }
+
+        #result {
+            margin-top: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #388e3c;
+        }
+
+        .error {
+            color: #d32f2f !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Alzheimer's Detection</h1>
+        <form id="uploadForm">
+            <input type="file" name="file" accept="image/*" required><br>
+            <button type="submit">Upload & Predict</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById("uploadForm");
+        const resultDiv = document.getElementById("result");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.classList.remove("error")
+                    resultDiv.innerHTML = `🧠 Predicted Class: <strong>${data.predicted_class}</strong><br>`;
+                } else {
+                    resultDiv.classList.add("error");
+                    resultDiv.textContent = data.error || "An error occurred.";
+                }
+            } catch (error) {
+                resultDiv.classList.add("error");
+                resultDiv.textContent = "❌ Failed to connect to the server.";
+            }
+        });
+    </script>
+</body>
+</html>
